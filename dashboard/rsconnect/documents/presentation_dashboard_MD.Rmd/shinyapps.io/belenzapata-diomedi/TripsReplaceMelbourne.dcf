@@ -1,0 +1,13 @@
+name: TripsReplaceMelbourne
+title: TripsReplaceMelbourne
+username:
+account: belenzapata-diomedi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6971421
+bundleId: 6307193
+url: https://belenzapata-diomedi.shinyapps.io/TripsReplaceMelbourne/
+when: 1663287729.75945
+lastSyncTime: 1663287729.75946
+asMultiple: FALSE
+asStatic: FALSE
