@@ -6,49 +6,23 @@ output:
   flexdashboard::flex_dashboard:
     orientation: column
     source_code: embed
-    stroyboard: true
+    storyboard: true
     navbar:
 runtime: shiny
 ---
 
 ```{r global, include=FALSE}
-library(flexdashboard)
-library(kableExtra)
-library(shiny)
-library(plotly)
+
 library(dplyr)
-library(DT)
 library(knitr)
 library(shinyWidgets)
-# install.packages('rsconnect')
-
-
-
-pacman::p_load(
-  rio,             # data import/export     
-  here,            # locate files
-  tidyverse,       # data management and visualization
-  flexdashboard,   # dashboard versions of R Markdown reports
-  shiny,           # interactive figures
-  plotly           # interactive figures
-)
+library(tidyverse)
+library(flexdashboard)
+library(shiny)
 
 
 # Load data ---------------------------------------------------------------
-scenariosDF <- crossing(data.frame(max_walk=c(0,1,2)),
-                        data.frame(max_cycle=c(0,2,5)),
-                        data.frame(purpose=c("commuting", "all"))) %>%
-  filter(max_walk!=max_cycle) %>%
-  mutate(scen=paste0(purpose,"_",max_walk,"_",max_cycle)) %>%
-  mutate(title1=paste0(ifelse(max_walk>0, max_walk, max_cycle), "km \u2265 ",
-                       ifelse(max_walk>0, "walking", "cycling"), ifelse(max_walk>0 & max_cycle>0, paste(" ;", max_walk, "km",
-                                                                                                        "<", "cycling \u2264", max_cycle, "km"), ""))) 
-
-# Combinations age and sex for graphs and results
-age_sex_cohorts <- crossing(data.frame(age=c("15-19", "20-39", "40-64", "65plus", "all")),
-                            data.frame(sex=c('male', 'female', 'all'))) %>%
-  dplyr::mutate(cohort=paste0(age,"_",sex))
-
+output_transport_modes <- read_csv('output_transport_modes.csv')
 
 diseaseLevels <- c("ishd","strk",
                    "brsc","carc","tbalc","utrc","mltm", "chml","stmc", "lvrc","hanc",
@@ -61,32 +35,6 @@ diseaseLabels <- c("Ischemic heart disease","Stroke",
                    "Diabetes type 2",
                    "Depression", 
                    "Alzheimers disease and other dementias")
-
-finalLocation <- "./output/melbourne-outputs"
-
-output_df_agg_all <- import(here(paste0(finalLocation,"/output_df_agg.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-output_diseases_change <- import(here(paste0(finalLocation,"/output_diseases_change.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-output_life_years_change <- import(here(paste0(finalLocation,"/output_life_years_change.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-PAall<-import(here(paste0(finalLocation,"/PAall.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-PAallGuide<-import(here(paste0(finalLocation,"/PAallGuide.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-output_transport_modes<-import(here(paste0(finalLocation,"/output_transport_modes.rds"))) %>% ## add titles
-  left_join(scenariosDF)
-
-output_transport_modes <- as_tibble(output_transport_modes %>%
-    mutate(mode=factor(mode,
-                       levels=c("walking","bicycle","public.transport","car","other"),
-                       labels=c("Walking","Cycling","Public transport","Car","Other"))) %>%
-    mutate(age=ifelse(age=="all", "all age groups", age),
-           sex=ifelse(sex=="all", "females and males", sex), 
-           sex=ifelse(sex=="male", "males", sex), 
-           sex=ifelse(sex=="female", "females", sex)) %>%
-    mutate(scenario=factor(scenario, levels=c("bl","sc"), labels=c("Base case", "Scenario"))))
-
 ```
 
 ```{r data}
